@@ -1,0 +1,10 @@
+{
+  "name": "HerbSafe Ghana",
+  "short_name": "HerbSafe",
+  "description": "Report a bad reaction to a herbal medicine and check herbal products.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#14532d",
+  "icons": [{ "src": "./favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
