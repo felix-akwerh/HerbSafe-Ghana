@@ -5,6 +5,7 @@ import { Button, Card, Choices, Field, inputClass, Note } from '../components/ui
 import { SUSPICIOUS_ISSUES, TOWNS } from '../lib/options'
 import { saveReport } from '../lib/store'
 import { newTrackingCode } from '../lib/tracking'
+import { looksLikeText } from '../lib/validate'
 import { emptyReport, type Report } from '../lib/types'
 
 export default function Suspicious() {
@@ -20,6 +21,10 @@ export default function Suspicious() {
   async function submit() {
     if (r.product.name.trim() === '' || r.suspicious.issue === '') {
       setProblem('Please name or describe the product, and choose what worries you.')
+      return
+    }
+    if (!looksLikeText(r.product.name)) {
+      setProblem('Please write the name of the product as it appears on the pack, or describe it in words.')
       return
     }
     const report: Report = { ...r, id: newTrackingCode(), createdAt: new Date().toISOString(), consent: true }

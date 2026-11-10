@@ -36,11 +36,6 @@ export default function Layout() {
             In an emergency call <a href="tel:112" className="font-bold text-ink">112</a> or go to the nearest hospital.
           </p>
           <p>Prototype with sample data. Reports stay on this device and are not sent to anyone.</p>
-          <p>
-            <Link to="/reviewer" className="underline underline-offset-4 hover:text-ink">
-              Reviewer workspace
-            </Link>
-          </p>
         </div>
       </footer>
     </div>

@@ -36,7 +36,7 @@ export function sampleReports(): Report[] {
   b.patient = { ageGroup: '45_64', sex: 'male', pregnant: false }
   b.product = { productId: null, name: 'Unlabelled brown mixture in a reused bottle', manufacturer: '', fdaNumber: '', batch: '', boughtFrom: 'Bus or lorry station seller', photo: null }
   b.use = { reason: 'Waist pain', dose: 'Half a cup daily', startDate: daysAgo(12).slice(0, 10), stillTaking: 'no' }
-  b.reaction = { description: 'Customer came back with yellow eyes and dark urine after about a week. I told him to go to the hospital.', voiceNote: null, symptoms: ['Yellow eyes or skin', 'Dark or little urine'], onsetDate: daysAgo(5).slice(0, 10), outcome: 'not_recovered', warningSigns: ['Yellow eyes or skin'] }
+  b.reaction = { description: 'Customer came back with yellow eyes and dark urine after about a week. I told him to go to the hospital.', voiceNote: null, symptoms: ['Dark urine'], onsetDate: daysAgo(5).slice(0, 10), outcome: 'not_recovered', warningSigns: ['Yellow eyes or skin'] }
   b.other = { medicines: 'Blood pressure tablets, name not known', conditions: 'High blood pressure' }
   b.review.followUps = [{ at: daysAgo(1), from: 'reviewer', text: 'Thank you. Can you tell us the name of the hospital he went to?' }]
 

@@ -1,6 +1,9 @@
+/**
+ * Everyday signs. Anything that is also a warning sign lives only in WARNING_SIGNS,
+ * so a person never sees the same sign twice on one screen.
+ */
 export const SYMPTOMS = [
   'Skin rash or itching',
-  'Swelling of face or lips',
   'Vomiting',
   'Diarrhoea',
   'Stomach pain',
@@ -8,8 +11,7 @@ export const SYMPTOMS = [
   'Headache',
   'Fast heartbeat',
   'Blurred vision',
-  'Yellow eyes or skin',
-  'Dark or little urine',
+  'Dark urine',
   'Unusual bleeding',
 ]
 

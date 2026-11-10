@@ -8,7 +8,7 @@ export interface Check {
 }
 
 function describesReaction(r: Report): boolean {
-  return r.reaction.description.trim() !== '' || r.reaction.voiceNote !== null || r.reaction.symptoms.length > 0
+  return r.reaction.description.trim() !== '' || r.reaction.voiceNote !== null || r.reaction.symptoms.length > 0 || r.reaction.warningSigns.length > 0
 }
 
 export function checks(r: Report): Check[] {

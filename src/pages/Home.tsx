@@ -46,7 +46,8 @@ export default function Home() {
           </li>
           <li className="pt-5">
             <p className="font-bold">Do you sell or prescribe herbal medicine?</p>
-            <p className="text-muted">Reporting protects your customers and your business. Your name and number are kept private.</p>
+            <p className="mb-2 text-muted">Reporting protects your customers and your business. Your name and number are kept private.</p>
+            <ArrowLink to="/report?as=seller">Report for a customer</ArrowLink>
           </li>
         </ul>
       </Card>
