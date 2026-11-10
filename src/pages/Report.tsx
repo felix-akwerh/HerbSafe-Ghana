@@ -4,11 +4,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import PhotoInput from '../components/PhotoInput'
 import ProductPicker from '../components/ProductPicker'
 import VoiceRecorder from '../components/VoiceRecorder'
-import { Button, Card, Choices, Field, Note, Spec, UrgentBanner, inputClass } from '../components/ui'
+import { Button, Card, Choices, DateInput, Field, Note, Spec, UrgentBanner, inputClass } from '../components/ui'
 import { BOUGHT_FROM, SYMPTOMS, TOWNS, WARNING_SIGNS, toggle } from '../lib/options'
 import { SAMPLE_PRODUCTS } from '../lib/seed'
 import { saveReport } from '../lib/store'
 import { newTrackingCode } from '../lib/tracking'
+import { looksLikeText, todayIso } from '../lib/validate'
 import { AGE_LABEL, OUTCOME_LABEL, ROLE_LABEL, emptyReport, type AgeGroup, type Outcome, type Product, type Report, type ReporterRole } from '../lib/types'
 
 const DRAFT_KEY = 'herbsafe.draft.v1'
@@ -16,7 +17,6 @@ const STEPS = ['About you', 'The product', 'What happened', 'A few details', 'Se
 
 const options = <T extends string>(labels: Record<T, string>) => (Object.keys(labels) as T[]).map((value) => ({ value, label: labels[value] }))
 const list = (items: string[]) => items.map((value) => ({ value, label: value }))
-const today = () => new Date().toISOString().slice(0, 10)
 
 function pickProduct(r: Report, p: Product): Report {
   return { ...r, product: { ...r.product, productId: p.id, name: p.name, manufacturer: p.manufacturer, fdaNumber: p.fdaNumber } }
@@ -35,12 +35,15 @@ export default function ReportWizard() {
   useEffect(() => {
     get<{ step: number; report: Report }>(DRAFT_KEY).then((draft) => {
       const chosen = SAMPLE_PRODUCTS.find((p) => p.id === params.get('product'))
+      const as = params.get('as') as ReporterRole | null
       if (draft) {
         setR(draft.report)
         setStep(draft.step)
         setRestored(true)
-      } else if (chosen) {
-        setR((prev) => pickProduct(prev, chosen))
+      } else {
+        if (chosen) setR((prev) => pickProduct(prev, chosen))
+        // Links such as the sellers' section on Home open the report with the role already chosen.
+        if (as && as in ROLE_LABEL) setR((prev) => ({ ...prev, reporter: { ...prev.reporter, role: as } }))
       }
       setLoaded(true)
     })
@@ -56,8 +59,15 @@ export default function ReportWizard() {
 
   function check(): string {
     if (step === 1 && r.product.name.trim() === '') return 'Please tell us the name of the product, or describe it.'
-    if (step === 2 && r.reaction.description.trim() === '' && !r.reaction.voiceNote && r.reaction.symptoms.length === 0)
-      return 'Please record a voice note, type what happened, or tick at least one sign.'
+    if (step === 1 && !looksLikeText(r.product.name)) return 'Please write the name of the product as it appears on the pack, or describe it in words.'
+    if (step === 2) {
+      const typed = r.reaction.description.trim()
+      if (typed === '' && !r.reaction.voiceNote && r.reaction.symptoms.length === 0 && r.reaction.warningSigns.length === 0)
+        return 'Please record a voice note, type what happened, or tick at least one sign.'
+      if (typed !== '' && !looksLikeText(typed)) return 'Please describe what happened in words, or clear the box and use a voice note instead.'
+      if (r.reaction.onsetDate > todayIso()) return 'The date it started cannot be in the future.'
+    }
+    if (step === 3 && r.use.startDate > todayIso()) return 'The date it was first taken cannot be in the future.'
     if (step === 4 && !r.consent) return 'Please tick the box to agree before sending.'
     return ''
   }
@@ -186,9 +196,7 @@ export default function ReportWizard() {
           </Field>
           <Choices legend="Tick anything that happened" columns={2} options={list(SYMPTOMS)} value={r.reaction.symptoms} onChange={(s) => patch('reaction', { symptoms: toggle(r.reaction.symptoms, s) })} />
           <Choices legend="Did any of these happen?" hint="These need care straight away." options={list(WARNING_SIGNS)} value={r.reaction.warningSigns} onChange={(s) => patch('reaction', { warningSigns: toggle(r.reaction.warningSigns, s) })} />
-          <Field label="When did it start?" hint="Your best guess is fine.">
-            <input type="date" max={today()} className={inputClass} value={r.reaction.onsetDate} onChange={(e) => patch('reaction', { onsetDate: e.target.value })} />
-          </Field>
+          <DateInput label="When did it start?" hint="Your best guess is fine." value={r.reaction.onsetDate} onChange={(onsetDate) => patch('reaction', { onsetDate })} />
           <Choices legend={someoneElse ? 'How is the person now?' : 'How are you now?'} options={options(OUTCOME_LABEL)} value={r.reaction.outcome} onChange={(outcome: Outcome) => patch('reaction', { outcome })} />
         </Card>
       )}
@@ -202,9 +210,7 @@ export default function ReportWizard() {
           <Field label="How much, and how often?">
             <input className={inputClass} value={r.use.dose} onChange={(e) => patch('use', { dose: e.target.value })} placeholder="e.g. two tablespoons, morning and evening" />
           </Field>
-          <Field label="When was it first taken?">
-            <input type="date" max={today()} className={inputClass} value={r.use.startDate} onChange={(e) => patch('use', { startDate: e.target.value })} />
-          </Field>
+          <DateInput label="When was it first taken?" value={r.use.startDate} onChange={(startDate) => patch('use', { startDate })} />
           <Choices
             legend="Is it still being taken?"
             columns={2}

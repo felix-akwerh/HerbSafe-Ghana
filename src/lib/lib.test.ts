@@ -4,6 +4,8 @@ import { toCsv, toE2bDraft } from './export'
 import { sampleReports } from './seed'
 import { newTrackingCode } from './tracking'
 import { emptyReport } from './types'
+import { isoDate, looksLikeText } from './validate'
+import { SYMPTOMS, WARNING_SIGNS } from './options'
 
 describe('tracking code', () => {
   it('has the HS-XXX-XXX shape and avoids look-alike characters', () => {
@@ -58,5 +60,32 @@ describe('exports', () => {
     const csv = toCsv([r])
     expect(csv.split('\n')[0]).toContain('Completeness %')
     expect(csv).toContain('"Bitters, large ""family"" size"')
+  })
+})
+
+describe('looksLikeText', () => {
+  it('turns away keyboard filler', () => {
+    for (const junk of ['', 'z', 'zzzz', 'ZZZZ', 'aaa aaa', '....', '1234', '11']) expect(looksLikeText(junk)).toBe(false)
+  })
+  it('accepts short real names', () => {
+    for (const ok of ['PHC', 'Sample Herbal Bitters', 'Brown mixture', 'Ayoo 2']) expect(looksLikeText(ok)).toBe(true)
+  })
+})
+
+describe('isoDate', () => {
+  it('builds a day-first date into yyyy-mm-dd', () => {
+    expect(isoDate('9', '11', '2026')).toBe('2026-11-09')
+  })
+  it('rejects days that do not exist and short years', () => {
+    expect(isoDate('31', '2', '2026')).toBe('')
+    expect(isoDate('29', '2', '2025')).toBe('')
+    expect(isoDate('5', '3', '26')).toBe('')
+    expect(isoDate('', '3', '2026')).toBe('')
+  })
+})
+
+describe('sign lists', () => {
+  it('never shows the same sign in both lists', () => {
+    expect(SYMPTOMS.filter((s) => WARNING_SIGNS.includes(s))).toEqual([])
   })
 })

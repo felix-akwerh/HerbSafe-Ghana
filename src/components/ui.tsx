@@ -1,5 +1,6 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { useState, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { isoDate } from '../lib/validate'
 
 const base = 'inline-flex min-h-12 items-center justify-center gap-2 rounded-md px-5 text-base font-bold transition-colors disabled:opacity-40'
 const variants = {
@@ -66,6 +67,54 @@ export function Field({ label, hint, group = false, children }: { label: string;
 }
 
 export const inputClass = 'block min-h-12 w-full rounded-md border border-faint bg-paper px-3 py-2 text-base text-ink placeholder:text-faint focus:border-brand'
+
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+/**
+ * A date written day first, as people in Ghana write it, with the month by name so it
+ * cannot be misread. The browser's own date picker follows the phone's settings and often
+ * shows mm/dd/yyyy, so it is not used. `value` and `onChange` use yyyy-mm-dd, or '' when
+ * the date is not complete.
+ */
+export function DateInput({ label, hint, value, onChange }: { label: string; hint?: string; value: string; onChange: (iso: string) => void }) {
+  const [y = '', m = '', d = ''] = value ? value.split('-') : []
+  const [parts, setParts] = useState({ day: d ? String(Number(d)) : '', month: m ? String(Number(m)) : '', year: y })
+  const update = (next: Partial<typeof parts>) => {
+    const all = { ...parts, ...next }
+    setParts(all)
+    onChange(isoDate(all.day, all.month, all.year))
+  }
+  const filled = parts.day !== '' && parts.month !== '' && parts.year.length === 4
+  const wrong = filled && value === ''
+  return (
+    <fieldset>
+      <legend className="font-bold text-ink">{label}</legend>
+      {hint && <p className="mt-0.5 text-[0.9375rem] text-muted">{hint}</p>}
+      <div className="mt-2 grid grid-cols-[4.5rem_1fr_5.5rem] gap-2">
+        <label className="block">
+          <span className="block text-[0.9375rem] text-muted">Day</span>
+          <input className={inputClass} inputMode="numeric" maxLength={2} placeholder="DD" aria-invalid={wrong} value={parts.day} onChange={(e) => update({ day: e.target.value.replace(/\D/g, '') })} />
+        </label>
+        <label className="block">
+          <span className="block text-[0.9375rem] text-muted">Month</span>
+          <select className={inputClass} aria-invalid={wrong} value={parts.month} onChange={(e) => update({ month: e.target.value })}>
+            <option value="">Month</option>
+            {MONTHS.map((name, i) => (
+              <option key={name} value={String(i + 1)}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block">
+          <span className="block text-[0.9375rem] text-muted">Year</span>
+          <input className={inputClass} inputMode="numeric" maxLength={4} placeholder="YYYY" aria-invalid={wrong} value={parts.year} onChange={(e) => update({ year: e.target.value.replace(/\D/g, '') })} />
+        </label>
+      </div>
+      {wrong && <p className="mt-1 text-[0.9375rem] font-bold text-danger">That date does not exist. Please check the day and month.</p>}
+    </fieldset>
+  )
+}
 
 /** Big tappable choices: one of several (radio) or any of several (checkbox). */
 export function Choices<T extends string>({ legend, hint, options, value, onChange, columns = 1 }: {

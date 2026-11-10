@@ -15,7 +15,7 @@ A phone-first website for reporting bad reactions to herbal medicines in Ghana, 
 - **Check a product** against a product register (eight invented sample products for now).
 - **Report a suspicious product or advert** with a shorter form.
 - **Track a report** by code and read the reviewer's follow-up questions.
-- **Reviewer workspace** (`#/reviewer`): queue sorted with warning signs first, completeness score, voice note playback with a transcript box, seriousness and WHO-UMC causality, follow-up messages, CSV export, and an E2B(R3) field-map draft per case.
+- **Reviewer workspace** (open `#/reviewer` directly; it is not linked from the public pages): queue sorted with warning signs first, completeness score, voice note playback with a transcript box, seriousness and WHO-UMC causality, follow-up messages, CSV export, and an E2B(R3) field-map draft per case.
 
 ## Not built yet
 
