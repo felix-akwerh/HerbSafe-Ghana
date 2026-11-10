@@ -1,12 +1,11 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 
-const base =
-  'inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-5 text-base font-semibold transition disabled:opacity-40'
+const base = 'inline-flex min-h-12 items-center justify-center gap-2 rounded-md px-5 text-base font-bold transition-colors disabled:opacity-40'
 const variants = {
-  primary: 'bg-leaf-800 text-white hover:bg-leaf-900',
-  secondary: 'border border-stone-300 bg-white text-stone-900 hover:bg-stone-50',
-  danger: 'border border-red-300 bg-white text-red-700 hover:bg-red-50',
+  primary: 'bg-brand text-paper hover:bg-brand-deep',
+  secondary: 'border border-ink bg-paper text-ink hover:bg-wash',
+  danger: 'border border-danger bg-paper text-danger hover:bg-danger-wash',
 }
 type Variant = keyof typeof variants
 
@@ -22,8 +21,36 @@ export function LinkButton({ to, variant = 'primary', className = '', children }
   )
 }
 
-export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-2xl border border-stone-200 bg-white p-5 ${className}`}>{children}</div>
+/** A text link that reads as an action: "Check a product →". */
+export function ArrowLink({ to, children }: { to: string; children: ReactNode }) {
+  return (
+    <Link to={to} className="group inline-flex items-baseline gap-1.5 font-bold text-brand underline decoration-line decoration-2 underline-offset-4 hover:decoration-brand">
+      {children}
+      <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">
+        →
+      </span>
+    </Link>
+  )
+}
+
+/** A flat section set off by a hairline, not a box. Pass `title` for a heading. */
+export function Card({ title, children, className = '' }: { title?: string; children: ReactNode; className?: string }) {
+  return (
+    <section className={`border-t border-line pt-6 ${className}`}>
+      {title && <h2 className="mb-3 text-xl font-semibold">{title}</h2>}
+      {children}
+    </section>
+  )
+}
+
+/** A tinted note: neutral information, a caution, or a danger. The only filled blocks on a page. */
+const noteTones = {
+  info: 'bg-wash text-ink',
+  warn: 'bg-warn-wash text-warn',
+  danger: 'bg-danger-wash text-danger',
+}
+export function Note({ tone = 'info', children, className = '' }: { tone?: keyof typeof noteTones; children: ReactNode; className?: string }) {
+  return <div className={`rounded-md px-4 py-3 ${noteTones[tone]} ${className}`}>{children}</div>
 }
 
 /** A labelled control. Use `group` when the child brings its own label or buttons (photo picker, recorder). */
@@ -31,15 +58,14 @@ export function Field({ label, hint, group = false, children }: { label: string;
   const Tag = group ? 'div' : 'label'
   return (
     <Tag className="block">
-      <span className="block text-base font-semibold text-stone-900">{label}</span>
-      {hint && <span className="mt-0.5 block text-sm text-stone-600">{hint}</span>}
+      <span className="block font-bold text-ink">{label}</span>
+      {hint && <span className="mt-0.5 block text-[0.9375rem] text-muted">{hint}</span>}
       <span className="mt-2 block">{children}</span>
     </Tag>
   )
 }
 
-export const inputClass =
-  'block min-h-12 w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-base text-stone-900 placeholder:text-stone-400'
+export const inputClass = 'block min-h-12 w-full rounded-md border border-faint bg-paper px-3 py-2 text-base text-ink placeholder:text-faint focus:border-brand'
 
 /** Big tappable choices: one of several (radio) or any of several (checkbox). */
 export function Choices<T extends string>({ legend, hint, options, value, onChange, columns = 1 }: {
@@ -54,48 +80,74 @@ export function Choices<T extends string>({ legend, hint, options, value, onChan
   const on = (v: T) => (many ? value.includes(v) : value === v)
   return (
     <fieldset>
-      <legend className="text-base font-semibold text-stone-900">{legend}</legend>
-      {hint && <p className="mt-0.5 text-sm text-stone-600">{hint}</p>}
+      <legend className="font-bold text-ink">{legend}</legend>
+      {hint && <p className="mt-0.5 text-[0.9375rem] text-muted">{hint}</p>}
       <div className={`mt-2 grid gap-2 ${columns === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>
-        {options.map((o) => (
-          <button
-            key={o.value}
-            type="button"
-            role={many ? 'checkbox' : 'radio'}
-            aria-checked={on(o.value)}
-            onClick={() => onChange(o.value)}
-            className={`min-h-12 rounded-xl border px-3 py-2 text-left text-base ${
-              on(o.value) ? 'border-leaf-700 bg-leaf-50 font-semibold text-leaf-900 ring-1 ring-leaf-700' : 'border-stone-300 bg-white text-stone-800'
-            }`}
-          >
-            {o.label}
-          </button>
-        ))}
+        {options.map((o) => {
+          const selected = on(o.value)
+          return (
+            <button
+              key={o.value}
+              type="button"
+              role={many ? 'checkbox' : 'radio'}
+              aria-checked={selected}
+              onClick={() => onChange(o.value)}
+              className={`flex min-h-12 items-center gap-3 rounded-md border px-3 py-2 text-left text-base leading-snug ${
+                selected ? 'border-brand bg-wash text-ink ring-1 ring-brand' : 'border-line bg-paper text-ink hover:border-faint'
+              }`}
+            >
+              <span aria-hidden="true" className={`flex h-5 w-5 shrink-0 items-center justify-center border ${many ? 'rounded-[3px]' : 'rounded-full'} ${selected ? 'border-brand bg-brand text-paper' : 'border-faint'}`}>
+                {selected && (many ? <svg viewBox="0 0 12 12" className="h-3 w-3"><path d="M2.5 6.2l2.4 2.4 4.6-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg> : <span className="h-2 w-2 rounded-full bg-paper" />)}
+              </span>
+              <span className="min-w-0">{o.label}</span>
+            </button>
+          )
+        })}
       </div>
     </fieldset>
   )
 }
 
 const tones = {
-  green: 'bg-leaf-100 text-leaf-900',
-  amber: 'bg-amber-100 text-amber-900',
-  red: 'bg-red-100 text-red-800',
-  grey: 'bg-stone-200 text-stone-800',
-  blue: 'bg-sky-100 text-sky-900',
+  green: 'text-brand',
+  amber: 'text-warn',
+  red: 'text-danger',
+  grey: 'text-muted',
+  blue: 'text-ink',
 }
 
+/** Status as a small dot and word, so a list of reports stays quiet until one needs attention. */
 export function Badge({ tone = 'grey', children }: { tone?: keyof typeof tones; children: ReactNode }) {
-  return <span className={`inline-block rounded-full px-2.5 py-0.5 text-sm font-semibold ${tones[tone]}`}>{children}</span>
+  return (
+    <span className={`inline-flex items-center gap-1.5 text-[0.9375rem] font-bold ${tones[tone]}`}>
+      <span aria-hidden="true" className="h-2 w-2 rounded-full bg-current" />
+      {children}
+    </span>
+  )
 }
 
 export function UrgentBanner() {
   return (
-    <div role="alert" className="rounded-2xl border-2 border-red-600 bg-red-50 p-4 text-red-900">
-      <p className="text-lg font-bold">Get medical help now</p>
-      <p className="mt-1">
+    <div role="alert" className="rounded-md border-l-4 border-danger bg-danger-wash px-4 py-3 text-danger">
+      <p className="font-display text-lg font-semibold">Get medical help now</p>
+      <p className="mt-1 text-ink">
         These signs can be dangerous. Go to the nearest hospital or clinic, or call <a className="font-bold underline" href="tel:112">112</a>. Take the
         product with you. You can finish this report later.
       </p>
     </div>
+  )
+}
+
+/** Label and value pairs set like the print on a medicine pack. */
+export function Spec({ rows }: { rows: ([string, ReactNode] | false | '')[] }) {
+  return (
+    <dl className="grid grid-cols-[8.5rem_1fr] gap-x-4 gap-y-1.5">
+      {rows.filter((row) => !!row).map(([label, value]) => (
+        <div key={label} className="contents">
+          <dt className="text-[0.9375rem] text-muted">{label}</dt>
+          <dd className="min-w-0 break-words text-ink">{value || <span className="text-faint">Not given</span>}</dd>
+        </div>
+      ))}
+    </dl>
   )
 }

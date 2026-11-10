@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Badge, Button, Card } from '../../components/ui'
+import { Badge, Button } from '../../components/ui'
 import { completeness, needsUrgentCare } from '../../lib/completeness'
 import { download, toCsv } from '../../lib/export'
 import { loadReports, resetDemo } from '../../lib/store'
@@ -46,11 +46,11 @@ export default function Queue() {
   ]
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Reviewer workspace</h1>
-          <p className="text-stone-700">Demo view. The pilot will put this behind a reviewer login.</p>
+          <h1 className="text-3xl font-semibold">Reviewer workspace</h1>
+          <p className="mt-1 text-muted">Demo view. The pilot will put this behind a reviewer login.</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" onClick={() => download('herbsafe-reports.csv', toCsv(reports), 'text/csv')}>
@@ -62,38 +62,39 @@ export default function Queue() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <dl className="grid grid-cols-2 gap-x-6 gap-y-4 border-y border-line py-5 sm:grid-cols-4">
         {stats.map((s) => (
-          <Card key={s.label} className="!p-4">
-            <p className="text-3xl font-bold text-leaf-900">{s.value}</p>
-            <p className="text-sm text-stone-700">{s.label}</p>
-          </Card>
+          <div key={s.label} className="flex flex-col-reverse">
+            <dt className="text-[0.9375rem] text-muted">{s.label}</dt>
+            <dd className="font-display text-4xl font-semibold tabular-nums">{s.value}</dd>
+          </div>
         ))}
-      </div>
+      </dl>
 
-      <div className="flex flex-wrap gap-2" role="tablist">
+      <div>
+      <div className="flex flex-wrap gap-x-6 border-b border-line" role="tablist">
         {FILTERS.map((f) => (
-          <button key={f.value} type="button" role="tab" aria-selected={filter === f.value} onClick={() => setFilter(f.value)} className={`min-h-10 rounded-full px-4 text-base ${filter === f.value ? 'bg-leaf-800 font-semibold text-white' : 'border border-stone-300 bg-white'}`}>
+          <button key={f.value} type="button" role="tab" aria-selected={filter === f.value} onClick={() => setFilter(f.value)} className={`-mb-px min-h-11 border-b-2 text-base ${filter === f.value ? 'border-brand font-bold text-ink' : 'border-transparent text-muted hover:text-ink'}`}>
             {f.label}
           </button>
         ))}
       </div>
 
-      <ul className="space-y-3">
+      <ul className="divide-y divide-line">
         {shown.map((r) => (
           <li key={r.id}>
-            <Link to={`/reviewer/${r.id}`} className="block rounded-2xl border border-stone-200 bg-white p-4 hover:border-leaf-700">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono font-bold">{r.id}</span>
+            <Link to={`/reviewer/${r.id}`} className="group block py-5">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                <span className="font-mono text-[0.9375rem] text-muted">{r.id}</span>
                 <Badge tone={STATUS_TONE[r.status]}>{STATUS_LABEL[r.status]}</Badge>
                 {needsUrgentCare(r) && <Badge tone="red">Warning signs</Badge>}
                 {r.kind === 'suspicious' && <Badge>Product or advert</Badge>}
                 {r.reaction.voiceNote && <Badge tone="blue">Voice note</Badge>}
                 {r.sample && <Badge>Sample</Badge>}
               </div>
-              <p className="mt-2 text-lg font-semibold">{r.product.name || 'Product not named'}</p>
-              <p className="text-stone-700">{r.kind === 'reaction' ? r.reaction.description || r.reaction.symptoms.join(', ') || 'Voice note only' : r.suspicious.issue}</p>
-              <p className="mt-2 text-sm text-stone-600">
+              <p className="mt-1.5 font-display text-xl font-semibold group-hover:text-brand">{r.product.name || 'Product not named'}</p>
+              <p className="max-w-2xl text-ink">{r.kind === 'reaction' ? r.reaction.description || r.reaction.symptoms.join(', ') || 'Voice note only' : r.suspicious.issue}</p>
+              <p className="mt-1.5 text-[0.9375rem] text-muted">
                 {ROLE_LABEL[r.reporter.role]}
                 {r.reporter.town && ` · ${r.reporter.town}`} · {new Date(r.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                 {r.kind === 'reaction' && ` · ${completeness(r)}% complete`}
@@ -101,8 +102,9 @@ export default function Queue() {
             </Link>
           </li>
         ))}
-        {shown.length === 0 && <Card>Nothing here.</Card>}
+        {shown.length === 0 && <li className="py-5 text-muted">Nothing here.</li>}
       </ul>
+      </div>
     </div>
   )
 }

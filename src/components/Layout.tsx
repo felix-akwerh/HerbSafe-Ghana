@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 
 const nav = [
   { to: '/report', label: 'Report' },
@@ -8,35 +8,39 @@ const nav = [
 ]
 
 export default function Layout() {
+  // The reviewer workspace is a working tool and gets a wider column than the public forms.
+  const wide = useLocation().pathname.startsWith('/reviewer')
+  const column = `mx-auto w-full px-5 ${wide ? 'max-w-4xl' : 'max-w-xl'}`
   return (
     <div className="flex min-h-dvh flex-col">
-      <div className="bg-amber-200 px-4 py-1.5 text-center text-sm font-medium text-amber-950">
-        Prototype with sample data. Reports stay on this device and are not sent to anyone.
-      </div>
-      <header className="border-b border-stone-200 bg-white">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3">
-          <Link to="/" className="flex items-center gap-2 text-lg font-bold text-leaf-900">
-            <img src="./favicon.svg" alt="" className="h-8 w-8" />
-            HerbSafe Ghana
+      <header className="border-b border-line">
+        <div className={`${column} flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 py-4`}>
+          <Link to="/" className="font-display text-xl font-bold tracking-tight text-ink">
+            HerbSafe<span className="text-brand"> Ghana</span>
           </Link>
-          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-base">
+          <nav className="flex flex-wrap gap-x-5 gap-y-1">
             {nav.map((n) => (
-              <NavLink key={n.to} to={n.to} className={({ isActive }) => (isActive ? 'font-bold text-leaf-800 underline underline-offset-4' : 'text-stone-700')}>
+              <NavLink key={n.to} to={n.to} className={({ isActive }) => `py-1 ${isActive ? 'font-bold text-ink shadow-[0_2px_0_var(--color-brand)]' : 'text-muted hover:text-ink'}`}>
                 {n.label}
               </NavLink>
             ))}
           </nav>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6">
+      <main className={`${column} flex-1 py-8`}>
         <Outlet />
       </main>
-      <footer className="border-t border-stone-200 bg-white">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-2 px-4 py-4 text-sm text-stone-600">
-          <span>In an emergency call 112 or go to the nearest hospital.</span>
-          <Link to="/reviewer" className="underline">
-            Reviewer workspace
-          </Link>
+      <footer className="border-t border-line">
+        <div className={`${column} space-y-1 py-5 text-[0.9375rem] text-muted`}>
+          <p>
+            In an emergency call <a href="tel:112" className="font-bold text-ink">112</a> or go to the nearest hospital.
+          </p>
+          <p>Prototype with sample data. Reports stay on this device and are not sent to anyone.</p>
+          <p>
+            <Link to="/reviewer" className="underline underline-offset-4 hover:text-ink">
+              Reviewer workspace
+            </Link>
+          </p>
         </div>
       </footer>
     </div>

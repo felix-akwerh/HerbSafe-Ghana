@@ -67,25 +67,25 @@ export default function VoiceRecorder({ value, onChange }: { value: VoiceNote | 
   }
 
   if (!supported) {
-    return <p className="rounded-xl bg-stone-100 p-3 text-stone-700">Voice notes are not available in this browser. Please type what happened below.</p>
+    return <p className="rounded-md bg-wash px-4 py-3 text-muted">Voice notes are not available in this browser. Please type what happened below.</p>
   }
 
   return (
-    <div className="rounded-2xl border border-stone-300 bg-white p-4">
+    <div>
       {recording ? (
         <div className="flex flex-wrap items-center gap-3">
-          <span className="inline-flex items-center gap-2 text-lg font-bold text-red-700" aria-live="polite">
-            <span className="h-3 w-3 animate-pulse rounded-full bg-red-600" />
+          <span className="inline-flex items-center gap-2 font-mono text-lg font-bold text-danger" aria-live="polite">
+            <span className="h-3 w-3 animate-pulse rounded-full bg-danger" />
             Recording {clock(seconds)}
           </span>
-          <Button onClick={stop} className="bg-red-700 hover:bg-red-800">
+          <Button variant="danger" onClick={stop}>
             Stop
           </Button>
-          <span className="text-sm text-stone-600">Stops by itself at {clock(MAX_SECONDS)}.</span>
+          <span className="text-[0.9375rem] text-muted">Stops by itself at {clock(MAX_SECONDS)}.</span>
         </div>
       ) : value ? (
         <div className="space-y-3">
-          <p className="font-semibold text-leaf-900">Voice note saved ({clock(value.seconds)})</p>
+          <p className="font-bold">Voice note saved <span className="font-mono font-normal text-muted">{clock(value.seconds)}</span></p>
           <audio controls src={value.dataUrl} className="w-full" />
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" onClick={start}>
@@ -98,16 +98,16 @@ export default function VoiceRecorder({ value, onChange }: { value: VoiceNote | 
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-3">
-          <Button onClick={start}>
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden="true">
+          <Button variant="secondary" onClick={start}>
+            <svg viewBox="0 0 24 24" className="h-5 w-5 text-brand" fill="currentColor" aria-hidden="true">
               <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.9V22h2v-3.1A7 7 0 0 0 19 12h-2z" />
             </svg>
             Record a voice note
           </Button>
-          <span className="text-sm text-stone-600">Up to 2 minutes. Speak in the language you are most comfortable with.</span>
+          <span className="text-[0.9375rem] text-muted">Up to 2 minutes. Speak in the language you are most comfortable with.</span>
         </div>
       )}
-      {error && <p className="mt-3 text-red-700">{error}</p>}
+      {error && <p className="mt-3 text-danger">{error}</p>}
     </div>
   )
 }
