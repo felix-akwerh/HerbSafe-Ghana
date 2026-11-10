@@ -16,13 +16,13 @@ export default function PhotoInput({ value, onChange }: { value: string | null; 
     <div>
       {value ? (
         <div className="flex flex-wrap items-end gap-3">
-          <img src={value} alt="Product you photographed" className="h-32 w-32 rounded-xl border border-stone-300 object-cover" />
+          <img src={value} alt="Product you photographed" className="h-32 w-32 rounded-md border border-line object-cover" />
           <Button variant="danger" onClick={() => onChange(null)}>
             Remove photo
           </Button>
         </div>
       ) : (
-        <label className="inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-xl border border-stone-300 bg-white px-5 text-base font-semibold hover:bg-stone-50">
+        <label className="inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-md border border-ink bg-paper px-5 text-base font-bold hover:bg-wash">
           Take or choose a photo
           <input
             type="file"

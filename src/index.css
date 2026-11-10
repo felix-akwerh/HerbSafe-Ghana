@@ -1,25 +1,58 @@
+@import '@fontsource-variable/bricolage-grotesque/wght.css';
+@import '@fontsource/atkinson-hyperlegible/latin-400.css';
+@import '@fontsource/atkinson-hyperlegible/latin-700.css';
 @import 'tailwindcss';
 
+/*
+ * Layout: one narrow, left-aligned column on white. Sections are separated by space and
+ * hairlines, not boxes. Only things you can press or type into carry a border.
+ * Green is reserved for the action and the selected state; red and amber only signal risk.
+ */
 @theme {
-  --color-leaf-50: #f0fdf4;
-  --color-leaf-100: #dcfce7;
-  --color-leaf-200: #bbf7d0;
-  --color-leaf-600: #16a34a;
-  --color-leaf-700: #15803d;
-  --color-leaf-800: #166534;
-  --color-leaf-900: #14532d;
-  --color-sand: #f7f5ef;
-  --color-clay: #b45309;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --color-paper: #ffffff;
+  --color-wash: #f2f5f3;
+  --color-line: #dbe2dd;
+  --color-ink: #14201a;
+  --color-muted: #56655d;
+  --color-faint: #8a9790;
+  --color-brand: #0b5d3b;
+  --color-brand-deep: #084a2f;
+  --color-danger: #b3261e;
+  --color-danger-wash: #fcefed;
+  --color-warn: #7a4f00;
+  --color-warn-wash: #faf2df;
+
+  --font-sans: 'Atkinson Hyperlegible', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Atkinson Hyperlegible', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
 }
 
 html {
-  background: var(--color-sand);
-  color: #1c1917;
+  background: var(--color-paper);
+  color: var(--color-ink);
   -webkit-text-size-adjust: 100%;
 }
 
+body {
+  font-size: 1.0625rem;
+  line-height: 1.55;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
 :focus-visible {
-  outline: 3px solid var(--color-leaf-600);
+  outline: 2px solid var(--color-brand);
   outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }

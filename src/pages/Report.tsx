@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import PhotoInput from '../components/PhotoInput'
 import ProductPicker from '../components/ProductPicker'
 import VoiceRecorder from '../components/VoiceRecorder'
-import { Button, Card, Choices, Field, UrgentBanner, inputClass } from '../components/ui'
+import { Button, Card, Choices, Field, Note, Spec, UrgentBanner, inputClass } from '../components/ui'
 import { BOUGHT_FROM, SYMPTOMS, TOWNS, WARNING_SIGNS, toggle } from '../lib/options'
 import { SAMPLE_PRODUCTS } from '../lib/seed'
 import { saveReport } from '../lib/store'
@@ -90,32 +90,32 @@ export default function ReportWizard() {
   if (!loaded) return null
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       <div>
-        <p className="text-sm font-semibold text-leaf-800">
+        <p className="text-[0.9375rem] text-muted">
           Step {step + 1} of {STEPS.length}
         </p>
-        <h1 className="text-2xl font-bold">{STEPS[step]}</h1>
-        <div className="mt-3 flex gap-1.5" aria-hidden="true">
+        <h1 className="mt-1 text-3xl font-semibold">{STEPS[step]}</h1>
+        <div className="mt-4 flex gap-1" aria-hidden="true">
           {STEPS.map((s, i) => (
-            <span key={s} className={`h-2 flex-1 rounded-full ${i <= step ? 'bg-leaf-700' : 'bg-stone-300'}`} />
+            <span key={s} className={`h-0.5 flex-1 ${i <= step ? 'bg-brand' : 'bg-line'}`} />
           ))}
         </div>
       </div>
 
       {restored && (
-        <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-sky-100 px-3 py-2 text-sky-950">
+        <Note className="flex flex-wrap items-center justify-between gap-2">
           <span>We kept the report you started earlier.</span>
-          <button type="button" className="font-semibold underline" onClick={startOver}>
+          <button type="button" className="font-bold text-brand underline underline-offset-4" onClick={startOver}>
             Start a new one
           </button>
-        </div>
+        </Note>
       )}
 
       {r.reaction.warningSigns.length > 0 && <UrgentBanner />}
 
       {step === 0 && (
-        <Card className="space-y-5">
+        <Card className="space-y-6">
           <Choices legend="Who are you?" options={options(ROLE_LABEL)} value={r.reporter.role} onChange={(role: ReporterRole) => patch('reporter', { role })} />
           {(r.reporter.role === 'seller' || r.reporter.role === 'clinician') && (
             <Field label={r.reporter.role === 'seller' ? 'Name of your shop or clinic' : 'Name of your facility'}>
@@ -132,7 +132,7 @@ export default function ReportWizard() {
           />
           {r.patient.sex === 'female' && (
             <label className="flex min-h-12 items-center gap-3 text-base">
-              <input type="checkbox" className="h-6 w-6 accent-leaf-700" checked={r.patient.pregnant} onChange={(e) => patch('patient', { pregnant: e.target.checked })} />
+              <input type="checkbox" className="h-6 w-6 accent-brand" checked={r.patient.pregnant} onChange={(e) => patch('patient', { pregnant: e.target.checked })} />
               Pregnant or breastfeeding at the time
             </label>
           )}
@@ -140,7 +140,7 @@ export default function ReportWizard() {
       )}
 
       {step === 1 && (
-        <Card className="space-y-5">
+        <Card className="space-y-6">
           <Field group label="Which herbal product was it?" hint="Start typing and pick it from the list. If it is not there, keep what you typed.">
             <ProductPicker
               text={r.product.name}
@@ -149,11 +149,11 @@ export default function ReportWizard() {
             />
           </Field>
           {r.product.productId ? (
-            <p className="rounded-xl bg-leaf-50 px-3 py-2 text-leaf-900">
-              Matched to the register: <strong>{r.product.name}</strong>, {r.product.manufacturer} ({r.product.fdaNumber}).
-            </p>
+            <Note>
+              Matched to the register: <strong>{r.product.name}</strong>, {r.product.manufacturer} (<span className="font-mono text-[0.9375rem]">{r.product.fdaNumber}</span>).
+            </Note>
           ) : (
-            r.product.name.trim() !== '' && <p className="rounded-xl bg-amber-100 px-3 py-2 text-amber-950">Not matched to the register yet. A photo of the pack will help the reviewer identify it.</p>
+            r.product.name.trim() !== '' && <Note tone="warn">Not matched to the register yet. A photo of the pack will help the reviewer identify it.</Note>
           )}
           <Field group label="Photo of the pack or bottle" hint="Show the label, the registration number and the batch number if you can.">
             <PhotoInput value={r.product.photo} onChange={(photo) => patch('product', { photo })} />
@@ -173,10 +173,10 @@ export default function ReportWizard() {
       )}
 
       {step === 2 && (
-        <Card className="space-y-5">
+        <Card className="space-y-6">
           <div>
-            <p className="text-base font-semibold">Tell us what happened in your own words</p>
-            <p className="mt-0.5 text-sm text-stone-600">Say what {person} took, what {person} felt, and when it started.</p>
+            <p className="font-bold">Tell us what happened in your own words</p>
+            <p className="mt-0.5 text-[0.9375rem] text-muted">Say what {person} took, what {person} felt, and when it started.</p>
             <div className="mt-2">
               <VoiceRecorder value={r.reaction.voiceNote} onChange={(voiceNote) => patch('reaction', { voiceNote })} />
             </div>
@@ -194,8 +194,8 @@ export default function ReportWizard() {
       )}
 
       {step === 3 && (
-        <Card className="space-y-5">
-          <p className="text-stone-700">Skip anything you do not know.</p>
+        <Card className="space-y-6">
+          <p className="text-muted">Skip anything you do not know.</p>
           <Field label="What was the product taken for?">
             <input className={inputClass} value={r.use.reason} onChange={(e) => patch('use', { reason: e.target.value })} placeholder="e.g. malaria, waist pain" />
           </Field>
@@ -223,8 +223,8 @@ export default function ReportWizard() {
 
       {step === 4 && (
         <>
-          <Card className="space-y-5">
-            <p className="text-stone-700">A pharmacist may need to ask you a question. Your details are kept private and are never shared with the seller or maker.</p>
+          <Card className="space-y-6">
+            <p className="text-muted">A pharmacist may need to ask you a question. Your details are kept private and are never shared with the seller or maker.</p>
             <Field label="Phone number" hint="Optional, but without it we cannot contact you.">
               <input type="tel" inputMode="tel" className={inputClass} value={r.reporter.phone} onChange={(e) => patch('reporter', { phone: e.target.value })} placeholder="e.g. 024 123 4567" />
             </Field>
@@ -240,17 +240,18 @@ export default function ReportWizard() {
               </select>
             </Field>
           </Card>
-          <Card>
-            <h2 className="text-lg font-bold">Check your report</h2>
-            <dl className="mt-2 space-y-1 text-stone-800">
-              <div><dt className="inline font-semibold">Product: </dt><dd className="inline">{r.product.name}{r.product.productId ? ' (matched)' : ' (not matched)'}</dd></div>
-              <div><dt className="inline font-semibold">Voice note: </dt><dd className="inline">{r.reaction.voiceNote ? `Yes, ${r.reaction.voiceNote.seconds} seconds` : 'No'}</dd></div>
-              {r.reaction.description && <div><dt className="inline font-semibold">In your words: </dt><dd className="inline">{r.reaction.description}</dd></div>}
-              {r.reaction.symptoms.length > 0 && <div><dt className="inline font-semibold">Signs: </dt><dd className="inline">{r.reaction.symptoms.join(', ')}</dd></div>}
-              <div><dt className="inline font-semibold">Now: </dt><dd className="inline">{OUTCOME_LABEL[r.reaction.outcome]}</dd></div>
-            </dl>
-            <label className="mt-4 flex items-start gap-3 text-base">
-              <input type="checkbox" className="mt-0.5 h-6 w-6 shrink-0 accent-leaf-700" checked={r.consent} onChange={(e) => setR({ ...r, consent: e.target.checked })} />
+          <Card title="Check your report">
+            <Spec
+              rows={[
+                ['Product', `${r.product.name}${r.product.productId ? ' (matched)' : ' (not matched)'}`],
+                ['Voice note', r.reaction.voiceNote ? `Yes, ${r.reaction.voiceNote.seconds} seconds` : 'No'],
+                ...(r.reaction.description ? [['In your words', r.reaction.description] as [string, string]] : []),
+                ...(r.reaction.symptoms.length > 0 ? [['Signs', r.reaction.symptoms.join(', ')] as [string, string]] : []),
+                ['Now', OUTCOME_LABEL[r.reaction.outcome]],
+              ]}
+            />
+            <label className="mt-6 flex items-start gap-3 text-base">
+              <input type="checkbox" className="mt-0.5 h-6 w-6 shrink-0 accent-brand" checked={r.consent} onChange={(e) => setR({ ...r, consent: e.target.checked })} />
               <span>I agree that HerbSafe Ghana may review this report and share it with the Food and Drugs Authority to help keep medicines safe.</span>
             </label>
           </Card>
@@ -258,9 +259,11 @@ export default function ReportWizard() {
       )}
 
       {problem && (
-        <p role="alert" className="rounded-xl bg-red-100 px-3 py-2 font-semibold text-red-800">
-          {problem}
-        </p>
+        <Note tone="danger">
+          <p role="alert" className="font-bold">
+            {problem}
+          </p>
+        </Note>
       )}
 
       <div className="flex gap-3">
@@ -270,11 +273,11 @@ export default function ReportWizard() {
           </Button>
         )}
         {step < STEPS.length - 1 ? (
-          <Button className="flex-1" onClick={() => go(step + 1)}>
+          <Button className="flex-1 sm:flex-none sm:px-10" onClick={() => go(step + 1)}>
             Continue
           </Button>
         ) : (
-          <Button className="flex-1" onClick={submit}>
+          <Button className="flex-1 sm:flex-none sm:px-10" onClick={submit}>
             Send report
           </Button>
         )}

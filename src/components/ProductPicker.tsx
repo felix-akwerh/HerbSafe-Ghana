@@ -24,20 +24,20 @@ export default function ProductPicker({ text, onText, onPick }: { text: string; 
         }}
       />
       {open && text.trim().length >= 2 && (
-        <ul className="mt-2 divide-y divide-stone-200 overflow-hidden rounded-xl border border-stone-300 bg-white">
+        <ul className="mt-2 divide-y divide-line overflow-hidden rounded-md border border-faint bg-paper">
           {results.map((p) => (
             <li key={p.id}>
               <button
                 type="button"
-                className="flex w-full flex-wrap items-center justify-between gap-2 px-3 py-3 text-left hover:bg-leaf-50"
+                className="flex w-full flex-wrap items-center justify-between gap-2 px-3 py-3 text-left hover:bg-wash"
                 onClick={() => {
                   onPick(p)
                   setOpen(false)
                 }}
               >
                 <span>
-                  <span className="block font-semibold">{p.name}</span>
-                  <span className="block text-sm text-stone-600">
+                  <span className="block font-bold">{p.name}</span>
+                  <span className="block text-[0.9375rem] text-muted">
                     {p.manufacturer} · {p.form}
                   </span>
                 </span>
@@ -45,7 +45,7 @@ export default function ProductPicker({ text, onText, onPick }: { text: string; 
               </button>
             </li>
           ))}
-          {results.length === 0 && <li className="px-3 py-3 text-stone-700">No match in the register. Keep the name as you typed it and add a photo if you can.</li>}
+          {results.length === 0 && <li className="px-3 py-3 text-muted">No match in the register. Keep the name as you typed it and add a photo if you can.</li>}
         </ul>
       )}
     </div>

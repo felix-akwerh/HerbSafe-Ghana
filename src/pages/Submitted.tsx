@@ -13,17 +13,18 @@ export default function Submitted() {
   }, [id])
 
   return (
-    <div className="space-y-5">
-      <Card className="border-leaf-600 text-center">
-        <p className="text-lg font-semibold text-leaf-800">Thank you. We have your report.</p>
-        <p className="mt-3 text-stone-700">Your tracking code</p>
-        <p className="mt-1 select-all font-mono text-4xl font-bold tracking-wider text-leaf-900">{id}</p>
-        <p className="mt-3 text-stone-700">Write it down or take a screenshot. You will need it to check on your report.</p>
-      </Card>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-semibold">Thank you. We have your report.</h1>
+        <div className="mt-6 border-y border-ink py-4">
+          <p className="text-[0.9375rem] text-muted">Your tracking code</p>
+          <p className="mt-1 select-all font-mono text-4xl font-bold tracking-wide text-ink">{id}</p>
+        </div>
+        <p className="mt-3 text-muted">Write it down or take a screenshot. You will need it to check on your report.</p>
+      </div>
       {report && needsUrgentCare(report) && <UrgentBanner />}
-      <Card>
-        <h2 className="text-lg font-bold">What happens next</h2>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-stone-800">
+      <Card title="What happens next">
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-ink">
           <li>A pharmacist will read your report.</li>
           <li>If you gave a phone number, they may call or message you with a question.</li>
           <li>{report?.kind === 'suspicious' ? 'If the concern is confirmed, it is passed to the FDA to investigate.' : 'Keep the product and its pack. Do not throw it away yet.'}</li>
@@ -36,7 +37,7 @@ export default function Submitted() {
           Back to home
         </LinkButton>
       </div>
-      <p className="text-sm text-stone-600">
+      <p className="text-[0.9375rem] text-muted">
         Prototype note: this report was saved on this device only. Open the <Link to="/reviewer" className="underline">reviewer workspace</Link> to see it arrive.
       </p>
     </div>

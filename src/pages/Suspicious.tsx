@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import PhotoInput from '../components/PhotoInput'
-import { Button, Card, Choices, Field, inputClass } from '../components/ui'
+import { Button, Card, Choices, Field, inputClass, Note } from '../components/ui'
 import { SUSPICIOUS_ISSUES, TOWNS } from '../lib/options'
 import { saveReport } from '../lib/store'
 import { newTrackingCode } from '../lib/tracking'
@@ -28,12 +28,12 @@ export default function Suspicious() {
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">Report a product or advert</h1>
-        <p className="mt-1 text-stone-700">Use this when nobody has been hurt but something looks wrong. If someone became unwell, report a reaction instead.</p>
+        <h1 className="text-3xl font-semibold">Report a product or advert</h1>
+        <p className="mt-1 text-muted">Use this when nobody has been hurt but something looks wrong. If someone became unwell, report a reaction instead.</p>
       </div>
-      <Card className="space-y-5">
+      <Card className="space-y-6">
         <Field label="Name or description of the product">
           <input className={inputClass} value={r.product.name} onChange={(e) => setR({ ...r, product: { ...r.product, name: e.target.value } })} />
         </Field>
@@ -60,11 +60,13 @@ export default function Suspicious() {
         </Field>
       </Card>
       {problem && (
-        <p role="alert" className="rounded-xl bg-red-100 px-3 py-2 font-semibold text-red-800">
-          {problem}
-        </p>
+        <Note tone="danger">
+          <p role="alert" className="font-bold">
+            {problem}
+          </p>
+        </Note>
       )}
-      <Button className="w-full" onClick={submit}>
+      <Button className="w-full sm:w-auto" onClick={submit}>
         Send
       </Button>
     </div>
